@@ -22,7 +22,6 @@ func NewHandler(services *service.Service, db *sqlx.DB) *Handler {
 func (r *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	// Убедимся, что CORS middleware работает
 	fmt.Println("Setting up CORS middleware...")
 
 	router.Use(cors.New(cors.Config{
@@ -34,9 +33,6 @@ func (r *Handler) InitRoutes() *gin.Engine {
 
 	fmt.Println("CORS middleware applied!")
 
-	// Ваши маршрут
-
-	// Preflight-запрос для всех маршрутов
 	router.OPTIONS("/*path", func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")

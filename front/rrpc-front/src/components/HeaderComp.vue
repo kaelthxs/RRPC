@@ -23,31 +23,30 @@
             </button>
         </div>
     </div>
+
 </div>
+<!-- <AuthComp></AuthComp> -->
 </template>
 
 <script>
 // import AuthComp from './components/AuthComp.vue'
-// export default {
-//   name: 'AuthPage',
-//   components: {
-//     AuthComp
-//   },
-//   data () {
-//     return {
-//         visibility: false
-//   }
-// },
-// methods: {
-//     showForm() {
-//         if (this.visibility == false) {
-//             this.visibility = true 
-//         } else {
-//             this.visibility = false
-//         }
-//     }
-// }
-// }
+export default {
+  name: 'AuthPage',
+  components: {
+    // AuthComp
+  },
+  data () {
+    return {
+        visibility: false
+  }
+},
+methods: {
+    showForm() {
+        this.visibility = !this.visibility;
+        this.$emit('toggle-auth', this.visibility); // Передаём событие наверх
+    }
+}
+}
 </script>
 
 <style scoped>

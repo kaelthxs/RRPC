@@ -33,7 +33,7 @@ func (r *Handler) getAllCategory(c *gin.Context) {
 
 	var category []RRPC.Category
 
-	query := "SELECT name FROM category"
+	query := "SELECT id, name FROM category"
 	log.Println("Executing query:", query)
 
 	if r.db == nil {

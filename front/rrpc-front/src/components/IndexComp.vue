@@ -1,10 +1,10 @@
 <template>
     <div class="main">
         <div class="container">
-            <div class="main__card">
+            <div class="main__card" v-for="(card, index) in cards" :key="card.id" :infoAboutCard="cards[index]">
                 <img src="../../src/assets/imgs/VideoCarta.png" alt="" class="card__photo">
-                <div class="card__undertext">
-                    {category.name}
+                <div class="card__undertext" >
+                    {{ card.Name }}
                 </div>
             </div>
         </div>
@@ -19,11 +19,11 @@ export default {
   data() {
     return {
       cards: [
-        // {
-        //   id: 1,
-        //   image: 'image 1.png',
-        //   username: 'summer freestyle',
-        // }
+        {
+          id: 1,
+          image: 'image 1.png',
+          Name: 'summer freestyle',
+        }
       ]
     }
   },
@@ -39,12 +39,13 @@ export default {
       this.cards = response.data.map(item => ({
         id: item.id,
         image: item.img || 'image 1.png',
-        username: item.username,
+        Name: item.Name
+
       }));
     }
   },
   mounted() {
-    this.getAllAlbums();
+    this.getAllCategories();
   }
 }
 
@@ -71,11 +72,12 @@ export default {
 
 .main__card:hover {
     transform: scale(1.1);
+
 }
 
 .container {
     padding-left: 150px;
-    padding-right: 150px;
+    /* padding-right: 150px; */
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;

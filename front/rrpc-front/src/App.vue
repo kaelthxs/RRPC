@@ -1,29 +1,38 @@
 <template>
-  <HeaderComp/>
-  <IndexComp/>
-  <AuthComp/>
+  <HeaderComp @toggle-auth="toggleAuth" />
+  <AuthComp v-if="isAuthVisible" :closeAuth="closeAuth"/>
+  <IndexComp />
 </template>
 
 <script>
-import HeaderComp from './components/HeaderComp.vue'
-import IndexComp from './components/IndexComp.vue'
-import AuthComp from './components/AuthComp.vue'
+import HeaderComp from './components/HeaderComp.vue';
+import AuthComp from './components/AuthComp.vue';
+import IndexComp from './components/IndexComp.vue';
 
 export default {
-  name: 'App',
   components: {
     HeaderComp,
-    IndexComp,
-    AuthComp
+    AuthComp,
+    IndexComp
+  },
+  data() {
+    return {
+      isAuthVisible: false
+    };
+  },
+  methods: {
+    toggleAuth(value) {
+      this.isAuthVisible = value; // Обновляем состояние формы авторизации
+    },
+    closeAuth() {
+      this.isAuthVisible = false; // Закрываем окно
+    }
   }
-}
-
-
-
+};
 </script>
 
 <style>
-  body{margin: 0;padding: 0;box-sizing: border-box;max-width: 100%; font-family: "Roboto", serif;} 
+  body{margin: 0;padding: 0;box-sizing: border-box;max-width: 100%; font-family: "Roboto", serif; background-color: #222222;} 
   h1, h2, h3, h4, h5, h6, ul, ol, li, p{margin: 0;padding: 0;} 
   ul, ol{list-style: none;} 
   a{text-decoration: none;color: black;} 
