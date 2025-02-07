@@ -21,30 +21,32 @@ export default {
       cards: [
         {
           id: 1,
-          image: 'image 1.png',
-          Name: 'summer freestyle',
+          image: '',
+          Name: '',
         }
       ]
     }
   },
   methods: {
     async getAllCategories() {
-      const response = await axios.get('http://localhost:8080/api/category/', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-      this.response = response.data;
-      console.log(this.response)
-      this.cards = response.data.map(item => ({
-        id: item.id,
-        image: item.img || 'image 1.png',
-        Name: item.Name
+        if (localStorage.getItem('authToken') != '') {
+            const response = await axios.get('http://localhost:8080/api/category/', {
+            headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }   
+            });
+            this.response = response.data;
+            this.cards = response.data.map(item => ({
+                id: item.id,
+                image: item.img || 'image 1.png',
+                Name: item.Name
 
-      }));
+            }));
+        }
     }
   },
   mounted() {
+
     this.getAllCategories();
   }
 }

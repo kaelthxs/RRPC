@@ -18,9 +18,25 @@
             </button>
         </div>
         <div class="header__login-wrapper">
-            <button class="login-wrapper__button" @click="showForm">
+            <button class="login-wrapper__button" @click="showForm" v-if="!jwtAvailable">
                 Войти
             </button>
+
+            <div class="header__profile" v-if="jwtAvailable">
+                <div class="profile__svg"></div>
+                <div class="profile__menu">
+                    <button>
+                        Личный кабинет
+                    </button>
+                    <button>
+                        Корзина
+                    </button>
+                    <button @click="logout">
+                        Выйти
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -40,7 +56,14 @@ export default {
         visibility: false
   }
 },
+props: ['jwtAvailable', 'userRole'],
+
 methods: {
+    logout() {
+      localStorage.setItem('authToken', '');
+      this.$emit('JWTAvailability', false);
+      this.$emit('RoleOfUser', '');
+    },
     showForm() {
         this.visibility = !this.visibility;
         this.$emit('toggle-auth', this.visibility); // Передаём событие наверх

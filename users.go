@@ -17,5 +17,5 @@ type Users struct {
 	Email         string   `gorm:"unique;not null"`
 	Password_hash string   `gorm:"not null"`
 	Role          UserRole `gorm:"type:user_role;default:'customer'"`
-	CreatedAt     time.Time
+	Created_at    time.Time
 }

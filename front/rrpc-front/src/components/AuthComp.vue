@@ -44,15 +44,17 @@ export default {
   data () {
     
     return {
-    greetings: false,
+    JWTAvailability: false,
     ChosenAuth: true,
     ChosenRegister: false,
+    roleOfAuthUser: 'admin',
+
     dataNewUser: {
         Username: '',
         Email: '',
         Password: '',
         repeatPassword: '',
-        Role: 'customer'
+        Role: 'admin'
     },
       dataUser: {
         username: '',
@@ -60,15 +62,55 @@ export default {
       },
       token: localStorage.getItem('authToken'),
     }
-
   },
   methods: {
+
+    sendRoleToApp() {
+            this.$emit('RoleOfUser', this.dataNewUser.Role); // Передаём событие наверх
+    },
+
     closeAuthForm() {
         this.closeAuth();
     },
     sendDataToBack () {
       console.log(this.dataUser)
     },
+
+    getUserIdFromJWT() {
+    const token = localStorage.getItem('authToken'); 
+    if (!token) {
+        console.warn("JWT токен не найден");
+        return null;
+    }
+
+    try {
+        const payloadBase64 = token.split('.')[1]; // Получаем payload (вторая часть JWT)
+        const decodedPayload = JSON.parse(atob(payloadBase64)); // Декодируем из base64
+
+        return decodedPayload.UserId;
+        
+    } catch (error) {
+        console.error('Ошибка декодирования JWT:', error);
+        return null;
+    }
+},
+
+
+    async getUserRoleById() {
+        const userId = this.getUserIdFromJWT();        
+        if (localStorage.getItem('authToken') != '') { 
+            const response = await axios.get(`http://localhost:8080/api/user/${userId}`, {
+            headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }   
+            });
+            this.response = response.data;
+            console.log(this.response)
+            this.roleOfAuthUser = response.data['Role'];
+            console.log(this.roleOfAuthUser)
+        }
+    },
+
     async sendSignIn() {
       try {
         const response = await axios.post('http://localhost:8080/auth/sign-in', JSON.stringify(this.dataUser), { headers: { 'Content-Type': 'application/json' }
@@ -76,16 +118,22 @@ export default {
         if (response.data.token) {
           localStorage.setItem('authToken', response.data.token);
           console.log('Токен сохранен в localStorage:', response.data.token);
+          this.JWTAvailability = true;
+          this.$emit('JWTAvailability', true); // Передача события наверх
+          this.getUserRoleById()
+          this.$emit('RoleOfUser', this.roleOfAuthUser); // Передача роли пользователя
           this.closeAuthForm();
         }
+        
         this.responseMessage = response.data.message;
-        console.log(response.data.token);
 
       } catch (error) {
         console.error('Ошибка при отправке данных:', error);
         console.log(this.dataUser)
       }
     },
+
+
 
 
     async sendSignUp() {

@@ -13,12 +13,12 @@ import (
 const (
 	salt       = "sdfihuf77dshdssd"
 	signingKey = "djfsdhuuteutrnfj3434354"
-	tokenTTL   = 12 * time.Hour
+	tokenTTL   = 4353 * time.Hour
 )
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	UserId int `json:"UserId"`
 }
 
 type AuthService struct {
@@ -54,9 +54,12 @@ func (s *AuthService) CreateUser(user RRPC.Users) (int, error) {
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
-
 		return "", err
 	}
+
+	fmt.Println("Найден пользователь:", user)
+
+	fmt.Println("User ID перед созданием токена:", user.ID)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{

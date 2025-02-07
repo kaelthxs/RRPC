@@ -53,6 +53,22 @@ func (r *Handler) getUserById(c *gin.Context) {
 	c.JSON(200, users)
 }
 
+func (r *Handler) getUserByUsername(c *gin.Context) {
+	username := c.Param("username")
+
+	var users RRPC.Users
+	query := "SELECT * FROM users WHERE username = $1"
+
+	err := r.db.Get(&users, query, username)
+	if err != nil {
+		log.Println("Error fetching client by username:", err)
+		c.JSON(404, gin.H{"error": "Client not found"})
+		return
+	}
+
+	c.JSON(200, users)
+}
+
 func (r *Handler) updateUser(c *gin.Context) {
 	id := c.Param("id")
 

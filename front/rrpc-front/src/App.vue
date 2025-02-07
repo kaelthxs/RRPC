@@ -1,6 +1,9 @@
 <template>
-  <HeaderComp @toggle-auth="toggleAuth" />
-  <AuthComp v-if="isAuthVisible" :closeAuth="closeAuth"/>
+  <HeaderComp :jwtAvailable="jwtAvailable" :userRole="userRole" @toggle-auth="toggleAuth" />
+  <AuthComp v-if="isAuthVisible" :closeAuth="closeAuth" 
+      @JWTAvailability="updateJWTAvailability"
+      @RoleOfUser="updateUserRole"
+      @closeAuth="showAuth = false"/>
   <IndexComp />
 </template>
 
@@ -17,16 +20,28 @@ export default {
   },
   data() {
     return {
-      isAuthVisible: false
+      isAuthVisible: false,
+      jwtAvailable: !!localStorage.getItem('authToken'),
+      userRole: ''
     };
   },
   methods: {
+
+    updateJWTAvailability(status) {
+      this.jwtAvailable = status;
+    },
+    updateUserRole(role) {
+      this.userRole = role;
+    },
+
     toggleAuth(value) {
-      this.isAuthVisible = value; // Обновляем состояние формы авторизации
+      this.isAuthVisible = value; // Обновляем состояние формы авторизации      
     },
     closeAuth() {
       this.isAuthVisible = false; // Закрываем окно
-    }
+    },
+
+    
   }
 };
 </script>

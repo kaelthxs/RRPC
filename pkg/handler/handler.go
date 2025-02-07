@@ -54,6 +54,7 @@ func (r *Handler) InitRoutes() *gin.Engine {
 			user.GET("/:id", r.getUserById)
 			user.PUT("/:id", r.updateUser)
 			user.DELETE("/:id", r.deleteUser)
+			user.GET("/getUserByUsername/:username", r.getUserByUsername)
 		}
 
 		category := api.Group("/category")
