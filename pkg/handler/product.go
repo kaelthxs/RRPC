@@ -15,9 +15,9 @@ func (h *Handler) createProduct(c *gin.Context) {
 		return
 	}
 
-	query := `INSERT INTO product (name, description, price, stock, category_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
+	query := `INSERT INTO product (name, creator, description, price, stock, CategoryId) VALUES ($1, $2, $3, $4, $5, $6)`
 
-	_, err := h.db.Exec(query, product.Name, product.Description, product.Price, product.Stock, product.CategoryID, product.CreatedAt)
+	_, err := h.db.Exec(query, product.Name, product.Creator, product.Description, product.Price, product.Stock, product.CategoryId)
 	if err != nil {
 		log.Println("Error creating product:", err)
 		c.JSON(500, gin.H{"error": "Failed to create product"})
@@ -75,6 +75,22 @@ func (r *Handler) getProductById(c *gin.Context) {
 	c.JSON(200, product)
 }
 
+func (r *Handler) getProductByCategory(c *gin.Context) {
+	CategoryID := c.Param("CategoryId")
+
+	var product []RRPC.Product
+	query := "SELECT * FROM product where categoryid = $1"
+
+	err := r.db.Select(&product, query, CategoryID)
+	if err != nil {
+		log.Println("Error fetching product by ID:", err)
+		c.JSON(404, gin.H{"error": "product not found"})
+		return
+	}
+
+	c.JSON(200, product)
+}
+
 func (r *Handler) updateProduct(c *gin.Context) {
 	id := c.Param("id")
 
@@ -87,11 +103,11 @@ func (r *Handler) updateProduct(c *gin.Context) {
 
 	query := `
 		UPDATE product
-		SET name = $1, description = $2, price = $3, stock = $4, category_id = $5, created_at = $6
+		SET name = $1, creator = $2, description = $3, price = $4, stock = $5, CategoryId = $6
 		WHERE id = $7
 	`
 
-	_, err := r.db.Exec(query, input.Name, input.Description, input.Price, input.Stock, input.CategoryID, input.CreatedAt, id)
+	_, err := r.db.Exec(query, input.Name, input.Description, input.Price, input.Stock, input.CategoryId, id)
 	if err != nil {
 		log.Println("Error updating product:", err)
 		c.JSON(500, gin.H{"error": "Failed to update product"})

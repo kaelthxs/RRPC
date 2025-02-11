@@ -1,7 +1,7 @@
 <template>
     <div class="main">
         <div class="container">
-            <div class="main__card" v-for="(card, index) in cards" :key="card.id" :infoAboutCard="cards[index]">
+            <div class="main__card" v-for="(card, index) in cards" :key="card.id" :infoAboutCard="cards[index]" @click="handleCardClick(card.Id)">
                 <img src="../../src/assets/imgs/VideoCarta.png" alt="" class="card__photo">
                 <div class="card__undertext" >
                     {{ card.Name }}
@@ -15,19 +15,22 @@
 
 import axios from 'axios';
 export default {
-  name: 'ArtistsPage',
+  name: 'IndexConp',
   data() {
     return {
       cards: [
-        {
-          id: 1,
-          image: '',
-          Name: '',
-        }
+
       ]
     }
   },
   methods: {
+
+  handleCardClick(categoryId) {
+    console.log("Кликнутый categoryId:", categoryId);
+    this.$emit('open-search', categoryId);
+  },
+
+
     async getAllCategories() {
         if (localStorage.getItem('authToken') != '') {
             const response = await axios.get('http://localhost:8080/api/category/', {
@@ -36,11 +39,11 @@ export default {
         }   
             });
             this.response = response.data;
+            console.log(this.response);
+            
             this.cards = response.data.map(item => ({
-                id: item.id,
-                image: item.img || 'image 1.png',
+                Id: item.Id,
                 Name: item.Name
-
             }));
         }
     }
@@ -78,12 +81,12 @@ export default {
 }
 
 .container {
-    padding-left: 150px;
-    /* padding-right: 150px; */
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     align-items: center;
+    justify-content: center;
     width: 100%;
+    justify-items: center;
 }
 .card__photo {
     margin-top: 20px;

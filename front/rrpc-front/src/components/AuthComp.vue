@@ -36,7 +36,7 @@
 <script>
 import axios from 'axios';
 export default {
-  name: 'AuthPage',
+  name: 'AuthComp',
   components: {
 
   },
@@ -111,18 +111,23 @@ export default {
         }
     },
 
+    reloadPage() {
+      window.location.reload();
+    },
+
     async sendSignIn() {
       try {
         const response = await axios.post('http://localhost:8080/auth/sign-in', JSON.stringify(this.dataUser), { headers: { 'Content-Type': 'application/json' }
         });
         if (response.data.token) {
-          localStorage.setItem('authToken', response.data.token);
-          console.log('Токен сохранен в localStorage:', response.data.token);
-          this.JWTAvailability = true;
-          this.$emit('JWTAvailability', true); // Передача события наверх
+          localStorage.setItem('authToken', response.data.token)
+          console.log('Токен сохранен в localStorage:', response.data.token)
+          this.JWTAvailability = true
+          this.$emit('JWTAvailability', true) // Передача события наверх
           this.getUserRoleById()
-          this.$emit('RoleOfUser', this.roleOfAuthUser); // Передача роли пользователя
-          this.closeAuthForm();
+          this.$emit('RoleOfUser', this.roleOfAuthUser) // Передача роли пользователя
+          this.closeAuthForm()
+          this.reloadPage()
         }
         
         this.responseMessage = response.data.message;
@@ -132,9 +137,6 @@ export default {
         console.log(this.dataUser)
       }
     },
-
-
-
 
     async sendSignUp() {
       try {
@@ -147,7 +149,7 @@ export default {
         }
         this.responseMessage = response.data.message;
         console.log(response.data.token);
-
+        this.reloadPage()
       } catch (error) {
         console.error('Ошибка при отправке данных:', error);
         console.log(this.dataUser)

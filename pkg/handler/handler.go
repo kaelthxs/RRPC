@@ -73,6 +73,7 @@ func (r *Handler) InitRoutes() *gin.Engine {
 			product.GET("/:id", r.getProductById)
 			product.PUT("/:id", r.updateProduct)
 			product.DELETE("/:id", r.deleteProduct)
+			product.GET("/productsbycategory/:CategoryId", r.getProductByCategory)
 		}
 
 		orders := api.Group("/orders")

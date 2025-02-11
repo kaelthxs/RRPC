@@ -4,25 +4,30 @@
       @JWTAvailability="updateJWTAvailability"
       @RoleOfUser="updateUserRole"
       @closeAuth="showAuth = false"/>
-  <IndexComp />
+      <IndexComp v-if="currentView === 'index'" @open-search="openSearch"/>
+      <ProductsComp v-if="currentView === 'search'" :categoryId="selectedCategoryId" @back="goBack" />
 </template>
 
 <script>
 import HeaderComp from './components/HeaderComp.vue';
 import AuthComp from './components/AuthComp.vue';
 import IndexComp from './components/IndexComp.vue';
+import ProductsComp from './components/ProductsComp.vue'
 
 export default {
   components: {
     HeaderComp,
     AuthComp,
-    IndexComp
+    IndexComp,
+    ProductsComp
   },
   data() {
     return {
       isAuthVisible: false,
       jwtAvailable: !!localStorage.getItem('authToken'),
-      userRole: ''
+      userRole: '',
+      currentView: 'index',
+      selectedCategoryId: null
     };
   },
   methods: {
@@ -40,6 +45,15 @@ export default {
     closeAuth() {
       this.isAuthVisible = false; // Закрываем окно
     },
+    
+    openSearch(categoryId) {
+      this.selectedCategoryId = categoryId; 
+      this.currentView = 'search';
+      console.log("Переданный categoryId:", this.selectedCategoryId); // Дебаг
+    },
+    goBack() {
+      this.currentView = 'index';
+    }
 
     
   }

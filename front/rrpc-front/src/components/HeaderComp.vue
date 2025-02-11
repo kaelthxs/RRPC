@@ -23,15 +23,19 @@
             </button>
 
             <div class="header__profile" v-if="jwtAvailable">
-                <div class="profile__svg"></div>
-                <div class="profile__menu">
-                    <button>
+                <button class="profile__svg--button" @click="showProfileMenuFunc">
+                    <svg class="profile__svg">
+                        <use href="../../src/assets/sprite.svg#user"></use>
+                    </svg>
+                </button>
+                <div class="profile__menu" v-if="showProfileMenu">
+                    <button class="profile__menu--button-user">
                         Личный кабинет
                     </button>
-                    <button>
+                    <button class="profile__menu--button-cart">
                         Корзина
                     </button>
-                    <button @click="logout">
+                    <button @click="logout" class="profile__menu--button-logout">
                         Выйти
                     </button>
                 </div>
@@ -47,23 +51,35 @@
 <script>
 // import AuthComp from './components/AuthComp.vue'
 export default {
-  name: 'AuthPage',
+  name: 'HeaderComp',
   components: {
     // AuthComp
   },
   data () {
     return {
-        visibility: false
+        visibility: false,
+        showProfileMenu: false
   }
 },
 props: ['jwtAvailable', 'userRole'],
 
 methods: {
+
+    showProfileMenuFunc() {
+        this.showProfileMenu = !this.showProfileMenu
+    },
+
     logout() {
       localStorage.setItem('authToken', '');
       this.$emit('JWTAvailability', false);
       this.$emit('RoleOfUser', '');
+      this.reloadPage()
     },
+
+    reloadPage() {
+      window.location.reload();
+    },
+
     showForm() {
         this.visibility = !this.visibility;
         this.$emit('toggle-auth', this.visibility); // Передаём событие наверх
@@ -73,6 +89,84 @@ methods: {
 </script>
 
 <style scoped>
+
+.header__profile {
+    display: flex;
+    justify-content: flex-end;
+
+}
+.profile__svg--button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    fill: white;
+    height: 46px;
+    width: 40px;
+    transition: .3s;
+}
+
+.profile__svg--button:hover {
+    transform: scale(1.1);
+}
+.profile__svg {
+    height: 46px;
+    width: 40px;
+
+}
+.profile__menu {
+    position: absolute;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    width: 300px;
+    right: 50%;
+    transform: translateX(50%);
+    border-radius: 50px;
+}
+
+.profile__menu--button-user {
+    background-color:#323232;
+    outline: none;
+    border: none;
+    color: white;
+    height: 50px;
+    border-radius: 40px 40px 0px 0px;
+}
+.profile__menu--button-cart {
+    background-color:#323232;
+    outline: none;
+    border: none;
+    color: white;
+    height: 50px;
+
+}
+.profile__menu--button-logout {
+    background-color:#323232;
+    outline: none;
+    border: none;
+    color: white;
+    height: 50px;
+    border-radius: 0px 0px 40px 40px;
+}
+
+.profile__menu--button-user:hover {
+    background-color:#5a5a5a;
+}
+
+.profile__menu--button-cart:hover {
+    background-color:#5a5a5a;
+}
+
+.profile__menu--button-logout:hover {
+    background-color:#5a5a5a;
+}
+
+
+.header__profile {
+    position: relative;
+}
+
 .header {
     width: 100%;
     height: 123px;
