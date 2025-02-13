@@ -1,45 +1,41 @@
 package handler
 
+import "C"
 import (
 	"RRPC"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
-func (h *Handler) createOrder(c *gin.Context) {
-	var order RRPC.Orders
+func (h *Handler) createCart(c *gin.Context) {
+	var cart RRPC.Cart
 	id := c.Param("id")
-	log.Println(id)
 
-	if err := c.BindJSON(&order); err != nil {
+	if err := c.BindJSON(&cart); err != nil {
 		log.Println("Error parsing input:", err)
 		c.JSON(400, gin.H{"error": "Invalid input"})
 		return
 	}
-	log.Println(order)
 
-	var newID int
-	query := `INSERT INTO orders (UserID, TotalPrice, CreatedAt) VALUES ($1, $2, $3) RETURNING id`
-	row := h.db.QueryRow(query, id, order.TotalPrice, order.CreatedAt)
-	if err := row.Scan(&newID); err != nil {
+	query := `INSERT INTO cart (user_id, total_price, created_at) VALUES ($1, $2, $3)`
+
+	_, err := h.db.Exec(query, id, cart.TotalPrice, cart.CreatedAt)
+	if err != nil {
 		log.Println("Error creating order:", err)
 		c.JSON(500, gin.H{"error": "Failed to create order"})
 		return
 	}
-	log.Println(newID)
-	c.JSON(200, gin.H{
-		"message": "order created successfully",
-		"id":      newID,
-	})
+
+	c.JSON(200, gin.H{"message": "order created successfully"})
 
 }
 
-func (r *Handler) getAllOrder(c *gin.Context) {
+func (r *Handler) getAllCart(c *gin.Context) {
 	log.Println("getAllOrder called")
 
-	var order []RRPC.Orders
+	var cart []RRPC.Cart
 
-	query := "SELECT * FROM orders"
+	query := "SELECT * FROM cart"
 	log.Println("Executing query:", query)
 
 	if r.db == nil {
@@ -48,46 +44,43 @@ func (r *Handler) getAllOrder(c *gin.Context) {
 		return
 	}
 
-	err := r.db.Select(&order, query)
+	err := r.db.Select(&cart, query)
 	if err != nil {
 		log.Println("Error executing query:", err)
 		c.JSON(500, gin.H{"error": "Failed to fetch order"})
 		return
 	}
 
-	log.Printf("Fetched %d order\n", len(order))
+	log.Printf("Fetched %d order\n", len(cart))
 
-	if len(order) == 0 {
+	if len(cart) == 0 {
 		c.JSON(200, gin.H{"message": "No order found"})
 		return
 	}
 
-	c.JSON(200, order)
+	c.JSON(200, cart)
 }
 
-func (r *Handler) getOrdersByUserId(c *gin.Context) {
+func (r *Handler) getCartById(c *gin.Context) {
 	id := c.Param("id")
 
-	log.Println("ID пользователя чтобы найти его заказы", id)
+	var cart RRPC.Cart
+	query := "SELECT * FROM cart WHERE id = $1"
 
-	var orders []RRPC.Orders
-	query := "SELECT * FROM orders WHERE UserID = $1"
-
-	err := r.db.Select(&orders, query, id)
+	err := r.db.Get(&cart, query, id)
 	if err != nil {
-		log.Println("Error fetching orders by user ID:", err)
-		c.JSON(404, gin.H{"error": "orders not found"})
+		log.Println("Error fetching order by ID:", err)
+		c.JSON(404, gin.H{"error": "order not found"})
 		return
 	}
 
-	log.Println("Это все заказы пользователя:", orders)
-	c.JSON(200, orders) // Возвращаем массив заказов!
+	c.JSON(200, cart)
 }
 
-func (r *Handler) updateOrder(c *gin.Context) {
+func (r *Handler) updateCart(c *gin.Context) {
 	id := c.Param("id")
 
-	var input RRPC.Orders
+	var input RRPC.Cart
 	if err := c.BindJSON(&input); err != nil {
 		log.Println("Error parsing input:", err)
 		c.JSON(400, gin.H{"error": "Invalid input"})
@@ -96,8 +89,8 @@ func (r *Handler) updateOrder(c *gin.Context) {
 
 	query := `
 		UPDATE orders
-		SET UserID = $1, TotalPrice = $2, CreatedAt = $3
-		WHERE id = $4
+		SET user_id = $1, status = $2, total_price = $3, created_at = $4
+		WHERE id = $5
 	`
 
 	_, err := r.db.Exec(query, input.UserID, input.TotalPrice, input.CreatedAt, id)
@@ -110,10 +103,10 @@ func (r *Handler) updateOrder(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "order updated successfully"})
 }
 
-func (r *Handler) deleteOrder(c *gin.Context) {
+func (r *Handler) deleteCart(c *gin.Context) {
 	id := c.Param("id")
 
-	query := "DELETE FROM orders WHERE id = $1"
+	query := "DELETE FROM cart WHERE id = $1"
 
 	_, err := r.db.Exec(query, id)
 	if err != nil {

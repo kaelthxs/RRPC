@@ -3,30 +3,22 @@ package handler
 import (
 	"RRPC"
 	"github.com/gin-gonic/gin"
-	"io"
 	"log"
 )
 
-func (h *Handler) createOrderItem(c *gin.Context) {
-	var orderItem RRPC.Order_Items
+func (h *Handler) createCartItemByCartID(c *gin.Context) {
+	var cartItem RRPC.CartItem
 	id := c.Param("id")
 
-	log.Println(" айди заказа для добавления айтемов", id)
-
-	if err := c.BindJSON(&orderItem); err != nil {
+	if err := c.BindJSON(&cartItem); err != nil {
 		log.Println("Error parsing input:", err)
 		c.JSON(400, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	body, _ := io.ReadAll(c.Request.Body)
-	log.Println("Полученный JSON:", string(body))
+	query := `INSERT INTO cart_item (cart_id, product_id, quantity, price_at_purchase) VALUES ($1, $2, $3, $4)`
 
-	log.Println("Ответ от фронта для создания итем ордера", orderItem)
-
-	query := `INSERT INTO order_item (order_id, product_id) VALUES ($1, $2)`
-
-	_, err := h.db.Exec(query, id, orderItem.ProductID)
+	_, err := h.db.Exec(query, id, cartItem.ProductID, cartItem.Quantity, cartItem.PriceAtPurchase)
 	if err != nil {
 		log.Println("Error creating orderItem:", err)
 		c.JSON(500, gin.H{"error": "Failed to create orderItem"})
@@ -37,12 +29,12 @@ func (h *Handler) createOrderItem(c *gin.Context) {
 
 }
 
-func (r *Handler) getAllOrderItem(c *gin.Context) {
+func (r *Handler) getAllCartItem(c *gin.Context) {
 	log.Println("getAllOrderItem called")
 
 	var orderItem []RRPC.Order_Items
 
-	query := "SELECT * FROM order_item"
+	query := "SELECT * FROM cart_item"
 	log.Println("Executing query:", query)
 
 	if r.db == nil {
@@ -68,11 +60,11 @@ func (r *Handler) getAllOrderItem(c *gin.Context) {
 	c.JSON(200, orderItem)
 }
 
-func (r *Handler) getOrderItemByOrderId(c *gin.Context) {
+func (r *Handler) getCartItemById(c *gin.Context) {
 	id := c.Param("id")
 
 	var orderItem RRPC.Order_Items
-	query := "SELECT * FROM order_item WHERE order_id = $1"
+	query := "SELECT * FROM cart_item WHERE id = $1"
 
 	err := r.db.Get(&orderItem, query, id)
 	if err != nil {
@@ -84,7 +76,7 @@ func (r *Handler) getOrderItemByOrderId(c *gin.Context) {
 	c.JSON(200, orderItem)
 }
 
-func (r *Handler) updateOrderItem(c *gin.Context) {
+func (r *Handler) updateCartItem(c *gin.Context) {
 	id := c.Param("id")
 
 	var input RRPC.Order_Items
@@ -95,9 +87,9 @@ func (r *Handler) updateOrderItem(c *gin.Context) {
 	}
 
 	query := `
-		UPDATE order_item
-		SET order_id = $1, product_id = $2
-		WHERE id = $3
+		UPDATE cart_item
+		SET cart_id = $1, product_id = $2, quantity = $3
+		WHERE id = $4
 	`
 
 	_, err := r.db.Exec(query, input.OrderID, input.ProductID, id)
@@ -110,10 +102,10 @@ func (r *Handler) updateOrderItem(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "orderItem updated successfully"})
 }
 
-func (r *Handler) deleteOrderItem(c *gin.Context) {
+func (r *Handler) deleteCartItem(c *gin.Context) {
 	id := c.Param("id")
 
-	query := "DELETE FROM order_item WHERE id = $1"
+	query := "DELETE FROM cart_item WHERE id = $1"
 
 	_, err := r.db.Exec(query, id)
 	if err != nil {

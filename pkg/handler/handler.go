@@ -78,18 +78,19 @@ func (r *Handler) InitRoutes() *gin.Engine {
 
 		orders := api.Group("/orders")
 		{
-			orders.POST("/", r.createOrder)
+			//orders.POST("/", r.createOrder)
 			orders.GET("/", r.getAllOrder)
-			orders.GET("/:id", r.getOrderById)
+			orders.GET("/:id", r.getOrdersByUserId)
+			orders.POST("/addOrderByUserId/:id", r.createOrder)
 			orders.PUT("/:id", r.updateOrder)
 			orders.DELETE("/:id", r.deleteOrder)
 		}
 
 		orderItem := api.Group("/orderItem")
 		{
-			orderItem.POST("/", r.createOrderItem)
+			orderItem.POST("/:id", r.createOrderItem)
 			orderItem.GET("/", r.getAllOrderItem)
-			orderItem.GET("/:id", r.getOrderItemById)
+			orderItem.GET("/:id", r.getOrderItemByOrderId)
 			orderItem.PUT("/:id", r.updateOrderItem)
 			orderItem.DELETE("/:id", r.deleteOrderItem)
 		}
@@ -114,6 +115,24 @@ func (r *Handler) InitRoutes() *gin.Engine {
 		payment := api.Group("/pay")
 		{
 			payment.POST("/", CreatePaymentIntent)
+		}
+
+		cart := api.Group("/cart")
+		{
+			cart.POST("/", r.createCart)
+			cart.GET("/", r.getAllCart)
+			cart.GET("/:id", r.getCartById)
+			cart.PUT("/:id", r.updateCart)
+			cart.DELETE("/:id", r.deleteCart)
+		}
+
+		CartItem := api.Group("/cartItem")
+		{
+			CartItem.POST("/:id", r.createCartItemByCartID)
+			CartItem.GET("/", r.getAllCartItem)
+			CartItem.GET("/:id", r.getCartItemById)
+			CartItem.PUT("/:id", r.updateCartItem)
+			CartItem.DELETE("/:id", r.deleteCartItem)
 		}
 
 	}

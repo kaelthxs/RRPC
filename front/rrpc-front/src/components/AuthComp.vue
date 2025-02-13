@@ -47,14 +47,14 @@ export default {
     JWTAvailability: false,
     ChosenAuth: true,
     ChosenRegister: false,
-    roleOfAuthUser: 'admin',
+    roleOfAuthUser: '',
 
     dataNewUser: {
         Username: '',
         Email: '',
         Password: '',
         repeatPassword: '',
-        Role: 'admin'
+        Role: 'customer'
     },
       dataUser: {
         username: '',

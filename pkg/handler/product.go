@@ -101,13 +101,15 @@ func (r *Handler) updateProduct(c *gin.Context) {
 		return
 	}
 
+	log.Println(input)
+
 	query := `
 		UPDATE product
 		SET name = $1, creator = $2, description = $3, price = $4, stock = $5, CategoryId = $6
 		WHERE id = $7
 	`
 
-	_, err := r.db.Exec(query, input.Name, input.Description, input.Price, input.Stock, input.CategoryId, id)
+	_, err := r.db.Exec(query, input.Name, input.Creator, input.Description, input.Price, input.Stock, input.CategoryId, id)
 	if err != nil {
 		log.Println("Error updating product:", err)
 		c.JSON(500, gin.H{"error": "Failed to update product"})
